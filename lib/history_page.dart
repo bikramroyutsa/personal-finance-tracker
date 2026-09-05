@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'services/database_service.dart';
 import 'settings_state.dart';
+import 'widgets/comparison_view.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -19,7 +20,7 @@ class _HistoryPageState extends State<HistoryPage> {
     final textColor = isDark ? Colors.white : const Color(0xFF111827);
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -32,6 +33,7 @@ class _HistoryPageState extends State<HistoryPage> {
             tabs: const [
               Tab(text: 'Logs'),
               Tab(text: 'Analytics'),
+              Tab(text: 'Comparison'),
             ],
           ),
         ),
@@ -39,6 +41,7 @@ class _HistoryPageState extends State<HistoryPage> {
           children: [
             _LogsView(),
             _AnalyticsView(),
+            ComparisonView(),
           ],
         ),
       ),
