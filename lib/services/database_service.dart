@@ -180,4 +180,27 @@ class DatabaseService {
       ORDER BY total DESC
     ''', [startOfDay, endOfDay]);
   }
+
+  Future<List<Map<String, dynamic>>> getAllTransactionsWithCategories({DateTime? startDate, DateTime? endDate}) async {
+    final db = await database;
+    String query = '''
+      SELECT 
+        t.id as transaction_id, t.amount, t.date, t.note,
+        s.name as subcategory_name,
+        c.name as category_name, c.icon_code, c.color_hex
+      FROM transactions t
+      JOIN subcategories s ON t.subcategory_id = s.id
+      JOIN categories c ON s.category_id = c.id
+    ''';
+    
+    List<dynamic> args = [];
+    if (startDate != null && endDate != null) {
+      query += ' WHERE t.date >= ? AND t.date <= ?';
+      args.addAll([startDate.millisecondsSinceEpoch, endDate.millisecondsSinceEpoch]);
+    }
+    
+    query += ' ORDER BY t.date DESC';
+    
+    return await db.rawQuery(query, args);
+  }
 }

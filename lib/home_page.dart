@@ -3,7 +3,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'settings_state.dart';
 import 'services/database_service.dart';
-import 'utils/lucide_icons_map.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -60,7 +59,43 @@ class HomePageState extends State<HomePage> {
     loadData();
   }
 
-
+  IconData _getIconData(String iconCode) {
+    switch (iconCode) {
+      case 'shoppingBag': return LucideIcons.shoppingBag;
+      case 'car': return LucideIcons.car;
+      case 'home': return LucideIcons.home;
+      case 'monitor': return LucideIcons.monitor;
+      case 'heart': return LucideIcons.heart;
+      case 'coffee': return LucideIcons.coffee;
+      case 'plane': return LucideIcons.plane;
+      case 'music': return LucideIcons.music;
+      case 'book': return LucideIcons.book;
+      case 'briefcase': return LucideIcons.briefcase;
+      case 'building': return LucideIcons.building;
+      case 'bus': return LucideIcons.bus;
+      case 'camera': return LucideIcons.camera;
+      case 'dumbbell': return LucideIcons.dumbbell;
+      case 'flame': return LucideIcons.flame;
+      case 'gamepad2': return LucideIcons.gamepad2;
+      case 'globe': return LucideIcons.globe;
+      case 'graduationCap': return LucideIcons.graduationCap;
+      case 'key': return LucideIcons.key;
+      case 'leaf': return LucideIcons.leaf;
+      case 'lightbulb': return LucideIcons.lightbulb;
+      case 'palette': return LucideIcons.palette;
+      case 'penTool': return LucideIcons.penTool;
+      case 'pill': return LucideIcons.pill;
+      case 'scissors': return LucideIcons.scissors;
+      case 'shirt': return LucideIcons.shirt;
+      case 'smartphone': return LucideIcons.smartphone;
+      case 'truck': return LucideIcons.truck;
+      case 'tv': return LucideIcons.tv;
+      case 'umbrella': return LucideIcons.umbrella;
+      case 'utensils': return LucideIcons.utensils;
+      case 'zap': return LucideIcons.zap;
+      default: return LucideIcons.circleDollarSign;
+    }
+  }
 
   Widget _buildSpendCard(String title, double amount, double maxAmount, String currency, bool isDark) {
     final double ratio = maxAmount > 0 ? (amount / maxAmount) : 0;
@@ -290,7 +325,7 @@ class HomePageState extends State<HomePage> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
-                                allLucideIcons[item['icon_code']] ?? LucideIcons.circleDollarSign,
+                                _getIconData(item['icon_code']),
                                 color: catColor,
                                 size: 24,
                               ),

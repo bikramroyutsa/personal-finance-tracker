@@ -3,8 +3,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'services/database_service.dart';
 import 'models/category.dart';
 import 'models/subcategory.dart';
-import 'utils/lucide_icons_map.dart';
-import 'widgets/icon_picker_sheet.dart';
 
 class ManageCategoriesPage extends StatefulWidget {
   const ManageCategoriesPage({super.key});
@@ -36,15 +34,56 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
       _subcategoriesMap = subMap;
     });
   }
-  
 
+  IconData _getIconData(String iconCode) {
+    switch (iconCode) {
+      case 'shoppingBag': return LucideIcons.shoppingBag;
+      case 'car': return LucideIcons.car;
+      case 'home': return LucideIcons.home;
+      case 'monitor': return LucideIcons.monitor;
+      case 'heart': return LucideIcons.heart;
+      case 'coffee': return LucideIcons.coffee;
+      case 'plane': return LucideIcons.plane;
+      case 'music': return LucideIcons.music;
+      case 'book': return LucideIcons.book;
+      case 'briefcase': return LucideIcons.briefcase;
+      case 'building': return LucideIcons.building;
+      case 'bus': return LucideIcons.bus;
+      case 'camera': return LucideIcons.camera;
+      case 'dumbbell': return LucideIcons.dumbbell;
+      case 'flame': return LucideIcons.flame;
+      case 'gamepad2': return LucideIcons.gamepad2;
+      case 'globe': return LucideIcons.globe;
+      case 'graduationCap': return LucideIcons.graduationCap;
+      case 'key': return LucideIcons.key;
+      case 'leaf': return LucideIcons.leaf;
+      case 'lightbulb': return LucideIcons.lightbulb;
+      case 'palette': return LucideIcons.palette;
+      case 'penTool': return LucideIcons.penTool;
+      case 'pill': return LucideIcons.pill;
+      case 'scissors': return LucideIcons.scissors;
+      case 'shirt': return LucideIcons.shirt;
+      case 'smartphone': return LucideIcons.smartphone;
+      case 'truck': return LucideIcons.truck;
+      case 'tv': return LucideIcons.tv;
+      case 'umbrella': return LucideIcons.umbrella;
+      case 'utensils': return LucideIcons.utensils;
+      case 'zap': return LucideIcons.zap;
+      default: return LucideIcons.circleDollarSign;
+    }
+  }
 
   void _showAddCategoryDialog() {
     final nameController = TextEditingController();
     String selectedIcon = 'circleDollarSign';
     String selectedColor = '0xFF6366F1'; // Default Indigo
     
-    final icons = ['shoppingBag', 'car', 'home', 'monitor', 'heart', 'coffee', 'plane', 'music', 'book', 'briefcase', 'circleDollarSign'];
+    final icons = [
+      'shoppingBag', 'car', 'home', 'monitor', 'heart', 'coffee', 'plane', 'music', 'book', 'briefcase', 
+      'circleDollarSign', 'building', 'bus', 'camera', 'dumbbell', 'flame', 'gamepad2', 'globe', 
+      'graduationCap', 'key', 'leaf', 'lightbulb', 'palette', 'penTool', 'pill', 'scissors', 
+      'shirt', 'smartphone', 'truck', 'tv', 'umbrella', 'utensils', 'zap'
+    ];
     final colors = ['0xFFEF4444', '0xFFF59E0B', '0xFF10B981', '0xFF3B82F6', '0xFF6366F1', '0xFF8B5CF6', '0xFFEC4899'];
 
     showDialog(
@@ -70,34 +109,19 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                     const SizedBox(height: 24),
                     const Text('Select Icon', style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
-                    GestureDetector(
-                      onTap: () async {
-                        final picked = await showModalBottomSheet<String>(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => IconPickerSheet(initialIcon: selectedIcon),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: icons.map((icon) {
+                        return ChoiceChip(
+                          label: Icon(_getIconData(icon), color: selectedIcon == icon ? Colors.white : textColor, size: 20),
+                          selected: selectedIcon == icon,
+                          selectedColor: const Color(0xFF6366F1),
+                          onSelected: (val) {
+                            setDialogState(() => selectedIcon = icon);
+                          },
                         );
-                        if (picked != null) {
-                          setDialogState(() => selectedIcon = picked);
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.black26 : Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(allLucideIcons[selectedIcon] ?? LucideIcons.circleDollarSign, color: textColor),
-                            const SizedBox(width: 12),
-                            Text(selectedIcon, style: TextStyle(color: textColor, fontSize: 16)),
-                            const Spacer(),
-                            Icon(Icons.chevron_right, color: textColor.withOpacity(0.5)),
-                          ],
-                        ),
-                      ),
+                      }).toList(),
                     ),
                     const SizedBox(height: 24),
                     const Text('Select Color', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -160,7 +184,12 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
     String selectedIcon = category.iconCode;
     String selectedColor = category.colorHex;
     
-    final icons = ['shoppingBag', 'car', 'home', 'monitor', 'heart', 'coffee', 'plane', 'music', 'book', 'briefcase', 'circleDollarSign'];
+    final icons = [
+      'shoppingBag', 'car', 'home', 'monitor', 'heart', 'coffee', 'plane', 'music', 'book', 'briefcase', 
+      'circleDollarSign', 'building', 'bus', 'camera', 'dumbbell', 'flame', 'gamepad2', 'globe', 
+      'graduationCap', 'key', 'leaf', 'lightbulb', 'palette', 'penTool', 'pill', 'scissors', 
+      'shirt', 'smartphone', 'truck', 'tv', 'umbrella', 'utensils', 'zap'
+    ];
     final colors = ['0xFFEF4444', '0xFFF59E0B', '0xFF10B981', '0xFF3B82F6', '0xFF6366F1', '0xFF8B5CF6', '0xFFEC4899'];
 
     showDialog(
@@ -186,34 +215,19 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                     const SizedBox(height: 24),
                     const Text('Select Icon', style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
-                    GestureDetector(
-                      onTap: () async {
-                        final picked = await showModalBottomSheet<String>(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => IconPickerSheet(initialIcon: selectedIcon),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: icons.map((icon) {
+                        return ChoiceChip(
+                          label: Icon(_getIconData(icon), color: selectedIcon == icon ? Colors.white : textColor, size: 20),
+                          selected: selectedIcon == icon,
+                          selectedColor: const Color(0xFF6366F1),
+                          onSelected: (val) {
+                            setDialogState(() => selectedIcon = icon);
+                          },
                         );
-                        if (picked != null) {
-                          setDialogState(() => selectedIcon = picked);
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.black26 : Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(allLucideIcons[selectedIcon] ?? LucideIcons.circleDollarSign, color: textColor),
-                            const SizedBox(width: 12),
-                            Text(selectedIcon, style: TextStyle(color: textColor, fontSize: 16)),
-                            const Spacer(),
-                            Icon(Icons.chevron_right, color: textColor.withOpacity(0.5)),
-                          ],
-                        ),
-                      ),
+                      }).toList(),
                     ),
                     const SizedBox(height: 24),
                     const Text('Select Color', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -379,7 +393,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
             child: ExpansionTile(
               leading: CircleAvatar(
                 backgroundColor: catColor.withOpacity(0.2),
-                child: Icon(allLucideIcons[cat.iconCode] ?? LucideIcons.circleDollarSign, color: catColor, size: 20),
+                child: Icon(_getIconData(cat.iconCode), color: catColor, size: 20),
               ),
               title: Row(
                 children: [
