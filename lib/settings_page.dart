@@ -1,9 +1,11 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'main.dart'; // For themeNotifier
 import 'settings_state.dart';
 import 'manage_categories_page.dart';
+import 'services/database_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -42,6 +44,89 @@ class _SettingsPageState extends State<SettingsPage> {
     if (val != null) {
       settingsNotifier.value = settingsNotifier.value.copyWith(monthlyMax: val);
     }
+  }
+
+  void _showResetConfirmation(BuildContext context) {
+    final randomString = (Random().nextInt(90000) + 10000).toString(); // 5 digit random number
+    String typedString = '';
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(LucideIcons.alertTriangle, color: Colors.red),
+                  SizedBox(width: 8),
+                  Text('Reset All Data', style: TextStyle(color: Colors.red)),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'WARNING: This will permanently delete all your transactions, custom categories, and data. This action CANNOT be undone.',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'To confirm, please type this code: $randomString',
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Type code here',
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        typedString = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: typedString == randomString
+                      ? () async {
+                          final messenger = ScaffoldMessenger.of(context);
+                          Navigator.of(dialogContext).pop();
+                          await DatabaseService().resetAllData();
+                          if (!mounted) return;
+                          
+                          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (context) => const MainScreen()),
+                            (route) => false,
+                          );
+
+                          messenger.showSnackBar(
+                            const SnackBar(content: Text('All data has been reset successfully.')),
+                          );
+                        }
+                      : null,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  child: const Text('Reset Data'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -259,6 +344,33 @@ class _SettingsPageState extends State<SettingsPage> {
                         const SnackBar(content: Text('Export functionality coming soon!')),
                       );
                     },
+                  ),
+                ),
+                const SizedBox(height: 32),
+                
+                // Reset Data Section
+                Text(
+                  'Danger Zone',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red.shade400,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Reset All Data
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.red.withOpacity(0.3)),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(LucideIcons.trash2, color: Colors.red),
+                    title: const Text('Reset All Data', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                    subtitle: Text('Permanently delete all data', style: TextStyle(color: Colors.red.withOpacity(0.7), fontSize: 12)),
+                    onTap: () => _showResetConfirmation(context),
                   ),
                 ),
               ],

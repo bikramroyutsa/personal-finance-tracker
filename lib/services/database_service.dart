@@ -203,4 +203,20 @@ class DatabaseService {
     
     return await db.rawQuery(query, args);
   }
+
+  Future<void> resetAllData() async {
+    final db = await database;
+    await db.execute('DELETE FROM transactions');
+    await db.execute('DELETE FROM subcategories');
+    await db.execute('DELETE FROM categories');
+    
+    // Reset auto-increment counters if sqlite_sequence exists
+    try {
+      await db.execute('DELETE FROM sqlite_sequence WHERE name IN ("transactions", "subcategories", "categories")');
+    } catch (e) {
+      // Ignore if sqlite_sequence doesn't exist
+    }
+    
+    await _seedCategories(db);
+  }
 }
