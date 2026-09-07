@@ -6,6 +6,7 @@ import 'history_page.dart';
 import 'settings_page.dart';
 import 'debts_page.dart';
 import 'widgets/add_transaction_sheet.dart';
+import 'widgets/add_debt_sheet.dart';
 import 'settings_state.dart';
 import 'onboarding_page.dart';
 
@@ -60,27 +61,46 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 1; // Default to Home
   final GlobalKey<HomePageState> _homeKey = GlobalKey<HomePageState>();
+  final GlobalKey<DebtsPageState> _debtsKey = GlobalKey<DebtsPageState>();
   
   // Draggable FAB position
   Offset? _fabPosition;
   
   void _openAddTransactionSheet() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: isDark ? const Color(0xFF1F2937) : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) => AddTransactionSheet(
-        isDark: isDark,
-        onTransactionAdded: () {
-          // Trigger a refresh on the home page when a transaction is added
-          _homeKey.currentState?.loadData();
-        },
-      ),
-    );
+    
+    if (_currentIndex == 2) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: isDark ? const Color(0xFF1F2937) : Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        builder: (context) => AddDebtSheet(
+          isDark: isDark,
+          onDebtAdded: () {
+            _debtsKey.currentState?.loadData();
+          },
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: isDark ? const Color(0xFF1F2937) : Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        builder: (context) => AddTransactionSheet(
+          isDark: isDark,
+          onTransactionAdded: () {
+            // Trigger a refresh on the home page when a transaction is added
+            _homeKey.currentState?.loadData();
+          },
+        ),
+      );
+    }
   }
 
   @override
@@ -98,7 +118,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           const HistoryPage(),
           HomePage(key: _homeKey),
-          const DebtsPage(),
+          DebtsPage(key: _debtsKey),
           const SettingsPage(),
         ],
       ),

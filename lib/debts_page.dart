@@ -9,20 +9,20 @@ class DebtsPage extends StatefulWidget {
   const DebtsPage({super.key});
 
   @override
-  State<DebtsPage> createState() => _DebtsPageState();
+  State<DebtsPage> createState() => DebtsPageState();
 }
 
-class _DebtsPageState extends State<DebtsPage> {
+class DebtsPageState extends State<DebtsPage> {
   List<DebtRecord> _debts = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    loadData();
   }
 
-  Future<void> _loadData() async {
+  Future<void> loadData() async {
     final data = await DatabaseService().getDebts();
     setState(() {
       _debts = data;
@@ -42,12 +42,12 @@ class _DebtsPageState extends State<DebtsPage> {
       note: debt.note,
     );
     await DatabaseService().updateDebt(updated);
-    await _loadData();
+    await loadData();
   }
 
   Future<void> _deleteDebt(DebtRecord debt) async {
     await DatabaseService().deleteDebt(debt.id!);
-    await _loadData();
+    await loadData();
   }
 
   @override
@@ -98,7 +98,7 @@ class _DebtsPageState extends State<DebtsPage> {
                       children: [
                         const Text('You are owed', style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600)),
                         const SizedBox(height: 8),
-                        Text('\${settingsNotifier.value.currency}\${totalLent.toStringAsFixed(2)}', style: const TextStyle(color: Colors.green, fontSize: 24, fontWeight: FontWeight.bold)),
+                        Text('${settingsNotifier.value.currency}${totalLent.toStringAsFixed(2)}', style: const TextStyle(color: Colors.green, fontSize: 24, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -117,7 +117,7 @@ class _DebtsPageState extends State<DebtsPage> {
                       children: [
                         const Text('You owe', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
                         const SizedBox(height: 8),
-                        Text('\${settingsNotifier.value.currency}\${totalBorrowed.toStringAsFixed(2)}', style: const TextStyle(color: Colors.red, fontSize: 24, fontWeight: FontWeight.bold)),
+                        Text('${settingsNotifier.value.currency}${totalBorrowed.toStringAsFixed(2)}', style: const TextStyle(color: Colors.red, fontSize: 24, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -170,7 +170,7 @@ class _DebtsPageState extends State<DebtsPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '\${debt.type} • \${DateFormat("MMM d, yyyy").format(debt.date)}',
+                                '${debt.type} • ${DateFormat("MMM d, yyyy").format(debt.date)}',
                                 style: TextStyle(color: textColor.withOpacity(0.6), fontSize: 12),
                               ),
                               if (debt.note != null && debt.note!.isNotEmpty)
@@ -181,7 +181,7 @@ class _DebtsPageState extends State<DebtsPage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                '\${settingsNotifier.value.currency}\${debt.amount.toStringAsFixed(2)}',
+                                '${settingsNotifier.value.currency}${debt.amount.toStringAsFixed(2)}',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: displayColor,

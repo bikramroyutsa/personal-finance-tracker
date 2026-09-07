@@ -26,7 +26,7 @@ class CsvService {
     // Transactions
     for (var t in transactions) {
       final date = DateTime.fromMillisecondsSinceEpoch(t['date']);
-      final dateStr = "\${date.year}-\${date.month.toString().padLeft(2, '0')}-\${date.day.toString().padLeft(2, '0')}";
+      final dateStr = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
       rows.add([
         dateStr,
         'Expense',
@@ -40,7 +40,7 @@ class CsvService {
 
     // Debts
     for (var d in debts) {
-      final dateStr = "\${d.date.year}-\${d.date.month.toString().padLeft(2, '0')}-\${d.date.day.toString().padLeft(2, '0')}";
+      final dateStr = "${d.date.year}-${d.date.month.toString().padLeft(2, '0')}-${d.date.day.toString().padLeft(2, '0')}";
       rows.add([
         dateStr,
         d.type,
