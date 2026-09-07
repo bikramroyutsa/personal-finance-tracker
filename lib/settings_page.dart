@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:currency_picker/currency_picker.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'dart:io' show Platform;
 import 'main.dart'; // For themeNotifier
 import 'settings_state.dart';
 import 'manage_categories_page.dart';
@@ -181,6 +183,51 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 16),
+                
+                // Floating Bubble Toggle
+                if (Platform.isAndroid)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: cardBg,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(isDark ? 0.2 : 0.02),
+                          blurRadius: 15,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                    ),
+                    child: ListTile(
+                      leading: Icon(LucideIcons.messageCircle, color: textColor),
+                      title: Text('Floating Quick Add', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
+                      subtitle: Text('Enable chat-head style bubble', style: TextStyle(color: textColor.withOpacity(0.5), fontSize: 12)),
+                      trailing: Switch(
+                        value: settings.enableFloatingBubble,
+                        onChanged: (val) async {
+                          if (val) {
+                            final bool status = await FlutterOverlayWindow.isPermissionGranted();
+                            if (!status) {
+                              final granted = await FlutterOverlayWindow.requestPermission();
+                              if (granted != true) return;
+                            }
+                            await FlutterOverlayWindow.showOverlay(
+                              height: 250,
+                              width: 250,
+                              alignment: OverlayAlignment.centerRight,
+                              enableDrag: true,
+                              flag: OverlayFlag.defaultFlag,
+                            );
+                          } else {
+                            await FlutterOverlayWindow.closeOverlay();
+                          }
+                          settingsNotifier.value = settings.copyWith(enableFloatingBubble: val);
+                        },
+                        activeColor: const Color(0xFF6366F1),
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 32),
                 
                 // Budgets Header

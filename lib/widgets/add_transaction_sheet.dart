@@ -7,10 +7,16 @@ import '../models/transaction_record.dart';
 import '../settings_state.dart';
 
 class AddTransactionSheet extends StatefulWidget {
-  final VoidCallback onTransactionAdded;
   final bool isDark;
+  final VoidCallback onTransactionAdded;
+  final bool shouldPop;
 
-  const AddTransactionSheet({super.key, required this.onTransactionAdded, required this.isDark});
+  const AddTransactionSheet({
+    super.key, 
+    required this.isDark, 
+    required this.onTransactionAdded,
+    this.shouldPop = true,
+  });
 
   @override
   State<AddTransactionSheet> createState() => _AddTransactionSheetState();
@@ -35,28 +41,26 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   
   Future<void> _loadCategories() async {
     final cats = await DatabaseService().getCategories();
-    setState(() {
-      _categories = cats;
-      if (cats.isNotEmpty) {
+    if (cats.isNotEmpty && mounted) {
+      setState(() {
+        _categories = cats;
         _selectedCategory = cats.first;
-        _loadSubCategories(cats.first.id!);
-      }
-    });
+      });
+      _loadSubCategories(cats.first.id!);
+    }
   }
 
   Future<void> _loadSubCategories(int categoryId) async {
     final subs = await DatabaseService().getSubCategories(categoryId);
-    setState(() {
-      _subCategories = subs;
-      if (subs.isNotEmpty) {
-        _selectedSubCategory = subs.first;
-      } else {
-        _selectedSubCategory = null;
-      }
-    });
+    if (mounted) {
+      setState(() {
+        _subCategories = subs;
+        _selectedSubCategory = subs.isNotEmpty ? subs.first : null;
+      });
+    }
   }
   
-  Future<void> _saveTransaction() async {
+  void _saveTransaction() async {
     if (_amountController.text.isEmpty || _selectedSubCategory == null) return;
     
     final amount = double.tryParse(_amountController.text);
@@ -71,7 +75,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     
     await DatabaseService().insertTransaction(transaction);
     widget.onTransactionAdded();
-    if (mounted) {
+    if (mounted && widget.shouldPop) {
       Navigator.pop(context);
     }
   }
@@ -97,7 +101,8 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Add Transaction', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: textColor)),
-              IconButton(icon: Icon(LucideIcons.x, color: textColor), onPressed: () => Navigator.pop(context)),
+              if (widget.shouldPop)
+                IconButton(icon: Icon(LucideIcons.x, color: textColor), onPressed: () => Navigator.pop(context)),
             ],
           ),
           const SizedBox(height: 16),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:quick_actions/quick_actions.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'home_page.dart';
 import 'history_page.dart';
 import 'settings_page.dart';
@@ -90,6 +92,18 @@ class _MainScreenState extends State<MainScreen> {
         icon: 'icon_add',
       ),
     ]);
+    
+    try {
+      if (Platform.isAndroid) {
+        FlutterOverlayWindow.overlayListener.listen((event) {
+          if (event == 'refresh_transactions') {
+            _homeKey.currentState?.loadData();
+          }
+        });
+      }
+    } catch (e) {
+      // Ignore if not supported
+    }
   }
   
   void _openAddTransactionSheet() {
