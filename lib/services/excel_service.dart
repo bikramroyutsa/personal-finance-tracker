@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
@@ -166,20 +167,15 @@ class ExcelService {
       }
     }
 
-    final Uri? outputFile = await FilePicker.saveFile(
-      dialogTitle: 'Save Excel File',
-      fileName: 'finance_tracker_export.xlsx',
-      type: FileType.custom,
-      allowedExtensions: ['xlsx'],
-    );
-
-    if (outputFile != null) {
-      final fileBytes = excel.encode();
-      if (fileBytes != null) {
-        File(outputFile.path)
-          ..createSync(recursive: true)
-          ..writeAsBytesSync(fileBytes);
-      }
+    final fileBytes = excel.encode();
+    if (fileBytes != null) {
+      await FilePicker.saveFile(
+        dialogTitle: 'Save Excel File',
+        fileName: 'finance_tracker_export.xlsx',
+        bytes: Uint8List.fromList(fileBytes),
+        type: FileType.custom,
+        allowedExtensions: ['xlsx'],
+      );
     }
   }
 }
