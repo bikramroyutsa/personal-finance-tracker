@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:quick_actions/quick_actions.dart';
 import 'home_page.dart';
 import 'history_page.dart';
 import 'settings_page.dart';
@@ -65,6 +66,31 @@ class _MainScreenState extends State<MainScreen> {
   
   // Draggable FAB position
   Offset? _fabPosition;
+  
+  final QuickActions quickActions = const QuickActions();
+
+  @override
+  void initState() {
+    super.initState();
+    quickActions.initialize((String shortcutType) {
+      if (shortcutType == 'action_add_transaction') {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          setState(() {
+            _currentIndex = 1; // Go to home just in case
+          });
+          _openAddTransactionSheet();
+        });
+      }
+    });
+
+    quickActions.setShortcutItems(<ShortcutItem>[
+      const ShortcutItem(
+        type: 'action_add_transaction',
+        localizedTitle: 'Add Transaction',
+        icon: 'icon_add',
+      ),
+    ]);
+  }
   
   void _openAddTransactionSheet() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -183,21 +209,26 @@ class _MainScreenState extends State<MainScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: _openAddTransactionSheet,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(32),
           child: Container(
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [activeColor, const Color(0xFF4F46E5)],
+              gradient: const LinearGradient(
+                colors: [Color(0xFFF43F5E), Color(0xFF8B5CF6)], // Rose to Purple
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: activeColor.withOpacity(0.4),
-                  blurRadius: 20,
+                  color: const Color(0xFF8B5CF6).withOpacity(0.5),
+                  blurRadius: 24,
+                  spreadRadius: 2,
                   offset: const Offset(0, 8),
                 )
               ],
