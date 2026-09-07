@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import '../models/category.dart';
 import '../models/subcategory.dart';
 import '../models/transaction_record.dart';
+import '../models/debt_record.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -23,13 +24,29 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDb,
       onUpgrade: (db, oldVersion, newVersion) async {
-        await db.execute('DROP TABLE IF EXISTS transactions');
-        await db.execute('DROP TABLE IF EXISTS subcategories');
-        await db.execute('DROP TABLE IF EXISTS categories');
-        await _createDb(db, newVersion);
+        if (oldVersion < 3) {
+          await db.execute('''
+            CREATE TABLE debts (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              type TEXT NOT NULL,
+              amount REAL NOT NULL,
+              person_name TEXT NOT NULL,
+              date INTEGER NOT NULL,
+              status TEXT NOT NULL,
+              note TEXT
+            )
+          ''');
+        } else {
+          // If we ever have a higher version where we need to recreate
+          await db.execute('DROP TABLE IF EXISTS transactions');
+          await db.execute('DROP TABLE IF EXISTS subcategories');
+          await db.execute('DROP TABLE IF EXISTS categories');
+          await db.execute('DROP TABLE IF EXISTS debts');
+          await _createDb(db, newVersion);
+        }
       }
     );
   }
@@ -61,6 +78,18 @@ class DatabaseService {
         subcategory_id INTEGER NOT NULL,
         note TEXT,
         FOREIGN KEY (subcategory_id) REFERENCES subcategories (id) ON DELETE CASCADE
+      )
+    ''');
+    
+    await db.execute('''
+      CREATE TABLE debts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type TEXT NOT NULL,
+        amount REAL NOT NULL,
+        person_name TEXT NOT NULL,
+        date INTEGER NOT NULL,
+        status TEXT NOT NULL,
+        note TEXT
       )
     ''');
     
@@ -204,15 +233,69 @@ class DatabaseService {
     return await db.rawQuery(query, args);
   }
 
+  // --- Category / Subcategory Get or Create ---
+  Future<CategoryModel> getOrCreateCategory(String name) async {
+    final db = await database;
+    final maps = await db.query('categories', where: 'name = ?', whereArgs: [name]);
+    if (maps.isNotEmpty) {
+      return CategoryModel.fromMap(maps.first);
+    }
+    // Create new
+    final id = await db.insert('categories', {
+      'name': name,
+      'icon_code': 'circleDollarSign',
+      'color_hex': '0xFF9CA3AF' // Default gray
+    });
+    return CategoryModel(id: id, name: name, iconCode: 'circleDollarSign', colorHex: '0xFF9CA3AF');
+  }
+
+  Future<SubCategoryModel> getOrCreateSubCategory(String name, int categoryId) async {
+    final db = await database;
+    final maps = await db.query('subcategories', where: 'name = ? AND category_id = ?', whereArgs: [name, categoryId]);
+    if (maps.isNotEmpty) {
+      return SubCategoryModel.fromMap(maps.first);
+    }
+    // Create new
+    final id = await db.insert('subcategories', {
+      'category_id': categoryId,
+      'name': name,
+    });
+    return SubCategoryModel(id: id, categoryId: categoryId, name: name);
+  }
+
+  // --- Debts CRUD ---
+  Future<int> insertDebt(DebtRecord debt) async {
+    final db = await database;
+    return await db.insert('debts', debt.toMap());
+  }
+
+  Future<List<DebtRecord>> getDebts() async {
+    final db = await database;
+    final maps = await db.query('debts', orderBy: 'date DESC');
+    return List.generate(maps.length, (i) => DebtRecord.fromMap(maps[i]));
+  }
+
+  Future<int> updateDebt(DebtRecord debt) async {
+    final db = await database;
+    return await db.update('debts', debt.toMap(), where: 'id = ?', whereArgs: [debt.id]);
+  }
+
+  Future<int> deleteDebt(int id) async {
+    final db = await database;
+    return await db.delete('debts', where: 'id = ?', whereArgs: [id]);
+  }
+
+
   Future<void> resetAllData() async {
     final db = await database;
     await db.execute('DELETE FROM transactions');
     await db.execute('DELETE FROM subcategories');
     await db.execute('DELETE FROM categories');
+    await db.execute('DELETE FROM debts');
     
     // Reset auto-increment counters if sqlite_sequence exists
     try {
-      await db.execute('DELETE FROM sqlite_sequence WHERE name IN ("transactions", "subcategories", "categories")');
+      await db.execute('DELETE FROM sqlite_sequence WHERE name IN ("transactions", "subcategories", "categories", "debts")');
     } catch (e) {
       // Ignore if sqlite_sequence doesn't exist
     }

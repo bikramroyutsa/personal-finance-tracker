@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'home_page.dart';
 import 'history_page.dart';
 import 'settings_page.dart';
+import 'debts_page.dart';
 import 'widgets/add_transaction_sheet.dart';
 import 'settings_state.dart';
 import 'onboarding_page.dart';
@@ -97,6 +98,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           const HistoryPage(),
           HomePage(key: _homeKey),
+          const DebtsPage(),
           const SettingsPage(),
         ],
       ),
@@ -130,8 +132,13 @@ class _MainScreenState extends State<MainScreen> {
               ),
               IconButton(
                 iconSize: 26,
-                icon: Icon(LucideIcons.settings, color: _currentIndex == 2 ? activeColor : inactiveColor),
+                icon: Icon(LucideIcons.users, color: _currentIndex == 2 ? activeColor : inactiveColor),
                 onPressed: () => setState(() => _currentIndex = 2),
+              ),
+              IconButton(
+                iconSize: 26,
+                icon: Icon(LucideIcons.settings, color: _currentIndex == 3 ? activeColor : inactiveColor),
+                onPressed: () => setState(() => _currentIndex = 3),
               ),
             ],
           ),

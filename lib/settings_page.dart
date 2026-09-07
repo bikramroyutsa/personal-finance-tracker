@@ -6,6 +6,7 @@ import 'main.dart'; // For themeNotifier
 import 'settings_state.dart';
 import 'manage_categories_page.dart';
 import 'services/database_service.dart';
+import 'services/csv_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -336,14 +337,32 @@ class _SettingsPageState extends State<SettingsPage> {
                       )
                     ],
                   ),
-                  child: ListTile(
-                    leading: Icon(LucideIcons.download, color: textColor),
-                    title: Text('Export to CSV', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Export functionality coming soon!')),
-                      );
-                    },
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(LucideIcons.download, color: textColor),
+                        title: Text('Export to CSV', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
+                        onTap: () async {
+                          await CsvService().exportToCsv();
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Export complete!')),
+                          );
+                        },
+                      ),
+                      Divider(height: 1, color: textColor.withOpacity(0.1)),
+                      ListTile(
+                        leading: Icon(LucideIcons.upload, color: textColor),
+                        title: Text('Import from CSV', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
+                        onTap: () async {
+                          final result = await CsvService().importFromCsv();
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(result)),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 32),
