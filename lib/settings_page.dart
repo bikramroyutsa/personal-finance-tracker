@@ -7,6 +7,7 @@ import 'settings_state.dart';
 import 'manage_categories_page.dart';
 import 'services/database_service.dart';
 import 'services/csv_service.dart';
+import 'services/excel_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -340,13 +341,32 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Column(
                     children: [
                       ListTile(
+                        leading: Icon(LucideIcons.fileSpreadsheet, color: textColor),
+                        title: Text('Export to Excel', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
+                        onTap: () async {
+                          try {
+                            await ExcelService().exportToExcel();
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Excel Export complete!')),
+                            );
+                          } catch (e) {
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Export failed: $e')),
+                            );
+                          }
+                        },
+                      ),
+                      Divider(height: 1, color: textColor.withOpacity(0.1)),
+                      ListTile(
                         leading: Icon(LucideIcons.download, color: textColor),
                         title: Text('Export to CSV', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
                         onTap: () async {
                           await CsvService().exportToCsv();
                           if (!mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Export complete!')),
+                            const SnackBar(content: Text('CSV Export complete!')),
                           );
                         },
                       ),

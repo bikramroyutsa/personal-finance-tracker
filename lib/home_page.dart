@@ -173,10 +173,11 @@ class HomePageState extends State<HomePage> {
     return ValueListenableBuilder<UserSettings>(
       valueListenable: settingsNotifier,
       builder: (context, settings, child) {
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(bottom: 120),
-          child: Column(
+        return SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: 120),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 8),
@@ -357,7 +358,7 @@ class HomePageState extends State<HomePage> {
                 ),
             ],
           ),
-        );
+        ));
       },
     );
   }
