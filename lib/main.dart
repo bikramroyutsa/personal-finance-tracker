@@ -5,8 +5,12 @@ import 'home_page.dart';
 import 'history_page.dart';
 import 'settings_page.dart';
 import 'widgets/add_transaction_sheet.dart';
+import 'settings_state.dart';
+import 'onboarding_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initSettings();
   runApp(const MyApp());
 }
 
@@ -36,7 +40,9 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           themeMode: currentMode,
-          home: const MainScreen(),
+          home: settingsNotifier.value.isFirstTime 
+              ? const OnboardingPage() 
+              : const MainScreen(),
         );
       },
     );
