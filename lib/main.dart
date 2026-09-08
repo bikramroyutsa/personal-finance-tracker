@@ -31,6 +31,7 @@ void main() async {
 }
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.dark);
+final ValueNotifier<int> appResetNotifier = ValueNotifier(0);
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -40,25 +41,31 @@ class MyApp extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
       builder: (context, currentMode, child) {
-        return MaterialApp(
-          title: 'Finance Tracker',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            brightness: Brightness.light,
-            scaffoldBackgroundColor: const Color(0xFFF9FAFB),
-            textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
-            useMaterial3: true,
-          ),
-          darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            scaffoldBackgroundColor: const Color(0xFF111827),
-            textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
-            useMaterial3: true,
-          ),
-          themeMode: currentMode,
-          home: settingsNotifier.value.isFirstTime 
-              ? const OnboardingPage() 
-              : const MainScreen(),
+        return ValueListenableBuilder<int>(
+          valueListenable: appResetNotifier,
+          builder: (context, resetKey, _) {
+            return MaterialApp(
+              key: ValueKey('app_root_$resetKey'),
+              title: 'Finance Tracker',
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                brightness: Brightness.light,
+                scaffoldBackgroundColor: const Color(0xFFF9FAFB),
+                textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
+                useMaterial3: true,
+              ),
+              darkTheme: ThemeData(
+                brightness: Brightness.dark,
+                scaffoldBackgroundColor: const Color(0xFF111827),
+                textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+                useMaterial3: true,
+              ),
+              themeMode: currentMode,
+              home: settingsNotifier.value.isFirstTime 
+                  ? const OnboardingPage() 
+                  : MainScreen(key: ValueKey('main_screen_$resetKey')),
+            );
+          },
         );
       },
     );

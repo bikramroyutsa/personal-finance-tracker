@@ -108,12 +108,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           final messenger = ScaffoldMessenger.of(context);
                           Navigator.of(dialogContext).pop();
                           await DatabaseService().resetAllData();
-                          if (!mounted) return;
                           
-                          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (context) => const MainScreen()),
-                            (route) => false,
-                          );
+                          // Trigger full immediate reactive UI reload
+                          appResetNotifier.value++;
 
                           messenger.showSnackBar(
                             const SnackBar(content: Text('All data has been reset successfully.')),
