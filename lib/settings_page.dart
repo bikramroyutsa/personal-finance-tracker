@@ -206,23 +206,43 @@ class _SettingsPageState extends State<SettingsPage> {
                       trailing: Switch(
                         value: settings.enableFloatingBubble,
                         onChanged: (val) async {
-                          if (val) {
-                            final bool status = await FlutterOverlayWindow.isPermissionGranted();
-                            if (!status) {
-                              final granted = await FlutterOverlayWindow.requestPermission();
-                              if (granted != true) return;
+                          try {
+                            settingsNotifier.value = settings.copyWith(enableFloatingBubble: val);
+                            if (val) {
+                              final bool status = await FlutterOverlayWindow.isPermissionGranted();
+                              if (!status) {
+                                final granted = await FlutterOverlayWindow.requestPermission();
+                                if (granted != true) {
+                                  // Revert if permission denied
+                                  settingsNotifier.value = settings.copyWith(enableFloatingBubble: false);
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Permission required for floating bubble.')),
+                                    );
+                                  }
+                                  return;
+                                }
+                              }
+                              await FlutterOverlayWindow.showOverlay(
+                                height: 80,
+                                width: 80,
+                                alignment: OverlayAlignment.centerRight,
+                                enableDrag: true,
+                                flag: OverlayFlag.focusPointer,
+                                positionGravity: PositionGravity.auto,
+                              );
+                            } else {
+                              try {
+                                await FlutterOverlayWindow.closeOverlay();
+                              } catch (_) {}
                             }
-                            await FlutterOverlayWindow.showOverlay(
-                              height: 250,
-                              width: 250,
-                              alignment: OverlayAlignment.centerRight,
-                              enableDrag: true,
-                              flag: OverlayFlag.defaultFlag,
-                            );
-                          } else {
-                            await FlutterOverlayWindow.closeOverlay();
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: Please fully restart the app to load native plugins. Details: $e')),
+                              );
+                            }
                           }
-                          settingsNotifier.value = settings.copyWith(enableFloatingBubble: val);
                         },
                         activeColor: const Color(0xFF6366F1),
                       ),

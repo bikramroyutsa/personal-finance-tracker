@@ -12,6 +12,17 @@ import 'widgets/add_transaction_sheet.dart';
 import 'widgets/add_debt_sheet.dart';
 import 'settings_state.dart';
 import 'onboarding_page.dart';
+import 'overlay_entry.dart';
+
+@pragma("vm:entry-point")
+void overlayMain() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initSettings();
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: ChatHeadWidget(),
+  ));
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -98,6 +109,12 @@ class _MainScreenState extends State<MainScreen> {
         FlutterOverlayWindow.overlayListener.listen((event) {
           if (event == 'refresh_transactions') {
             _homeKey.currentState?.loadData();
+          } else if (event == 'open_add_transaction') {
+            // Bring app to foreground and open add transaction
+            setState(() => _currentIndex = 1);
+            Future.delayed(const Duration(milliseconds: 300), () {
+              _openAddTransactionSheet();
+            });
           }
         });
       }
