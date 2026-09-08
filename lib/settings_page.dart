@@ -440,6 +440,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         title: Text('Import from CSV', style: TextStyle(color: textColor, fontWeight: FontWeight.w600)),
                         onTap: () async {
                           final result = await CsvService().importFromCsv();
+                          if (result.startsWith('Successfully')) {
+                            appResetNotifier.value++;
+                          }
                           if (!mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(result)),

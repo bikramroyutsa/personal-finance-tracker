@@ -221,12 +221,18 @@ class _MainScreenState extends State<MainScreen> {
               IconButton(
                 iconSize: 26,
                 icon: Icon(LucideIcons.layoutDashboard, color: _currentIndex == 1 ? activeColor : inactiveColor),
-                onPressed: () => setState(() => _currentIndex = 1),
+                onPressed: () {
+                  setState(() => _currentIndex = 1);
+                  _homeKey.currentState?.loadData();
+                },
               ),
               IconButton(
                 iconSize: 26,
                 icon: Icon(LucideIcons.users, color: _currentIndex == 2 ? activeColor : inactiveColor),
-                onPressed: () => setState(() => _currentIndex = 2),
+                onPressed: () {
+                  setState(() => _currentIndex = 2);
+                  _debtsKey.currentState?.loadData();
+                },
               ),
               IconButton(
                 iconSize: 26,

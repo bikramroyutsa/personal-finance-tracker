@@ -99,9 +99,14 @@ class HomePageState extends State<HomePage> {
 
   Widget _buildSpendCard(String title, double amount, double maxAmount, String currency, bool isDark) {
     final double ratio = maxAmount > 0 ? (amount / maxAmount) : 0;
+    final double clampedRatio = ratio.clamp(0.0, 1.0);
     
     List<Color> gradientColors;
-    if (ratio < 0.8) {
+    if (maxAmount <= 0) {
+      gradientColors = isDark 
+          ? [const Color(0xFF374151), const Color(0xFF1F2937)]
+          : [const Color(0xFF6B7280), const Color(0xFF4B5563)];
+    } else if (ratio < 0.8) {
       gradientColors = isDark 
           ? [const Color(0xFF059669), const Color(0xFF047857)]
           : [const Color(0xFF34D399), const Color(0xFF10B981)];
@@ -116,19 +121,21 @@ class HomePageState extends State<HomePage> {
     }
 
     final formattedAmount = amount.toStringAsFixed(2);
+    final formattedMax = maxAmount.toStringAsFixed(maxAmount % 1 == 0 ? 0 : 2);
+    final percentage = (ratio * 100).toInt();
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: gradientColors,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: gradientColors.last.withOpacity(isDark ? 0.4 : 0.3),
+            color: gradientColors.last.withValues(alpha: isDark ? 0.4 : 0.3),
             blurRadius: 15,
             offset: const Offset(0, 6),
           )
@@ -137,24 +144,118 @@ class HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: Colors.white70,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white70,
+                ),
+              ),
+              if (maxAmount > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '$percentage%',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              '$currency$formattedAmount',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                letterSpacing: -0.5,
+              ),
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            '$currency$formattedAmount',
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              letterSpacing: -1,
-            ),
+          // Progress Slider Bar
+          Stack(
+            children: [
+              Container(
+                height: 6,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              FractionallySizedBox(
+                widthFactor: maxAmount > 0 ? (clampedRatio == 0 && amount > 0 ? 0.05 : clampedRatio) : 0,
+                child: Container(
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: ratio > 1.0 ? const Color(0xFFFFD1D1) : Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 8),
+          // Max Spend / Remaining Label
+          if (maxAmount > 0)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    'Max: $currency$formattedMax',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ),
+                Text(
+                  ratio > 1.0 
+                      ? '+$currency${(amount - maxAmount).toStringAsFixed(0)}' 
+                      : '$currency${(maxAmount - amount).toStringAsFixed(0)} left',
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                    color: ratio > 1.0 ? const Color(0xFFFFD1D1) : Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+              ],
+            )
+          else
+            Text(
+              'No limit set',
+              style: TextStyle(
+                fontSize: 10.5,
+                fontStyle: FontStyle.italic,
+                color: Colors.white.withValues(alpha: 0.7),
+              ),
+            ),
         ],
       ),
     );
