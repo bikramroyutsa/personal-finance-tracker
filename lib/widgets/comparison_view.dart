@@ -7,10 +7,10 @@ class ComparisonView extends StatefulWidget {
   const ComparisonView({super.key});
 
   @override
-  State<ComparisonView> createState() => _ComparisonViewState();
+  State<ComparisonView> createState() => ComparisonViewState();
 }
 
-class _ComparisonViewState extends State<ComparisonView> {
+class ComparisonViewState extends State<ComparisonView> {
   String _filter = 'Weekly';
   List<Map<String, dynamic>> _transactions = [];
   bool _isLoading = true;
@@ -18,15 +18,17 @@ class _ComparisonViewState extends State<ComparisonView> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    loadData();
   }
 
-  Future<void> _loadData() async {
+  Future<void> loadData() async {
     final data = await DatabaseService().getAllTransactionsWithCategories();
-    setState(() {
-      _transactions = data;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _transactions = data;
+        _isLoading = false;
+      });
+    }
   }
 
   @override

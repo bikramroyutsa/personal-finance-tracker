@@ -176,6 +176,11 @@ class DatabaseService {
     final db = await database;
     return await db.insert('transactions', transaction.toMap());
   }
+
+  Future<int> deleteTransaction(int id) async {
+    final db = await database;
+    return await db.delete('transactions', where: 'id = ?', whereArgs: [id]);
+  }
   
   Future<double> getTotalSpendForDateRange(DateTime start, DateTime end) async {
     final db = await database;

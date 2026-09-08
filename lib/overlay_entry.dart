@@ -137,26 +137,22 @@ class _ChatHeadWidgetState extends State<ChatHeadWidget> {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFF43F5E), Color(0xFF8B5CF6)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: const Color(0xFF6366F1), // Primary Theme Indigo
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  width: 2,
+                  color: Colors.white.withValues(alpha: 0.3),
+                  width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.5),
-                    blurRadius: 15,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 5),
+                    color: const Color(0xFF6366F1).withValues(alpha: 0.45),
+                    blurRadius: 18,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 6),
                   )
                 ],
               ),
-              child: const Icon(LucideIcons.plus, color: Colors.white, size: 32),
+              child: const Icon(LucideIcons.plus, color: Colors.white, size: 28),
             ),
           ),
         ),

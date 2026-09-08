@@ -82,6 +82,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 1; // Default to Home
   final GlobalKey<HomePageState> _homeKey = GlobalKey<HomePageState>();
+  final GlobalKey<HistoryPageState> _historyKey = GlobalKey<HistoryPageState>();
   final GlobalKey<DebtsPageState> _debtsKey = GlobalKey<DebtsPageState>();
   
   // Draggable FAB position
@@ -116,6 +117,7 @@ class _MainScreenState extends State<MainScreen> {
         FlutterOverlayWindow.overlayListener.listen((event) {
           if (event == 'refresh_transactions') {
             _homeKey.currentState?.loadData();
+            _historyKey.currentState?.loadData();
           } else if (event == 'open_add_transaction') {
             // Bring app to foreground and open add transaction
             setState(() => _currentIndex = 1);
@@ -159,8 +161,9 @@ class _MainScreenState extends State<MainScreen> {
         builder: (context) => AddTransactionSheet(
           isDark: isDark,
           onTransactionAdded: () {
-            // Trigger a refresh on the home page when a transaction is added
+            // Trigger a refresh on home page and history logs
             _homeKey.currentState?.loadData();
+            _historyKey.currentState?.loadData();
           },
         ),
       );
@@ -180,7 +183,10 @@ class _MainScreenState extends State<MainScreen> {
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          const HistoryPage(),
+          HistoryPage(
+            key: _historyKey,
+            onTransactionChanged: () => _homeKey.currentState?.loadData(),
+          ),
           HomePage(key: _homeKey),
           DebtsPage(key: _debtsKey),
           const SettingsPage(),
@@ -207,7 +213,10 @@ class _MainScreenState extends State<MainScreen> {
               IconButton(
                 iconSize: 26,
                 icon: Icon(LucideIcons.history, color: _currentIndex == 0 ? activeColor : inactiveColor),
-                onPressed: () => setState(() => _currentIndex = 0),
+                onPressed: () {
+                  setState(() => _currentIndex = 0);
+                  _historyKey.currentState?.loadData();
+                },
               ),
               IconButton(
                 iconSize: 26,
@@ -252,26 +261,22 @@ class _MainScreenState extends State<MainScreen> {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFF43F5E), Color(0xFF8B5CF6)], // Rose to Purple
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: const Color(0xFF6366F1), // Primary Theme Indigo
               borderRadius: BorderRadius.circular(32),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.25),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.5),
-                  blurRadius: 24,
-                  spreadRadius: 2,
-                  offset: const Offset(0, 8),
+                  color: const Color(0xFF6366F1).withValues(alpha: 0.45),
+                  blurRadius: 18,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 6),
                 )
               ],
             ),
-            child: const Icon(LucideIcons.plus, color: Colors.white, size: 32),
+            child: const Icon(LucideIcons.plus, color: Colors.white, size: 28),
           ),
         ),
       ),
