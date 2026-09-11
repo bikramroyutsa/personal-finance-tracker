@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'models/category.dart';
@@ -25,6 +26,7 @@ class _ChatHeadWidgetState extends State<ChatHeadWidget> {
   SubCategoryModel? _selectedSubCategory;
   String _currency = '\$';
   bool _saved = false;
+  DateTime _selectedDate = DateTime.now();
   String? _errorMsg;
 
   @override
@@ -102,7 +104,7 @@ class _ChatHeadWidgetState extends State<ChatHeadWidget> {
 
     final transaction = TransactionRecord(
       amount: amount,
-      date: DateTime.now(),
+      date: _selectedDate,
       subCategoryId: _selectedSubCategory!.id!,
       note: _noteController.text.isEmpty ? null : _noteController.text,
     );
@@ -283,6 +285,39 @@ class _ChatHeadWidgetState extends State<ChatHeadWidget> {
                                 if (sub != null) setState(() => _selectedSubCategory = sub);
                               },
                             ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Date Picker
+                        Container(
+                          decoration: BoxDecoration(color: inputBg, borderRadius: BorderRadius.circular(12)),
+                          child: ListTile(
+                            leading: Icon(LucideIcons.calendar, color: textColor.withOpacity(0.7)),
+                            title: Text(
+                              DateFormat('MMM d, yyyy').format(_selectedDate),
+                              style: const TextStyle(color: textColor, fontWeight: FontWeight.bold),
+                            ),
+                            trailing: Icon(LucideIcons.chevronRight, color: textColor.withOpacity(0.5)),
+                            onTap: () async {
+                              final date = await showDatePicker(
+                                context: context,
+                                initialDate: _selectedDate,
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2100),
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: ThemeData.dark().copyWith(
+                                      colorScheme: const ColorScheme.dark(primary: Color(0xFF6366F1)),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
+                              );
+                              if (date != null) {
+                                setState(() => _selectedDate = date);
+                              }
+                            },
                           ),
                         ),
                         const SizedBox(height: 12),

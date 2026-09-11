@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../services/database_service.dart';
 import '../models/category.dart';
@@ -168,6 +169,41 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   if (sub != null) setState(() => _selectedSubCategory = sub);
                 },
               ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Date Picker
+          Container(
+            decoration: BoxDecoration(color: inputBg, borderRadius: BorderRadius.circular(12)),
+            child: ListTile(
+              leading: Icon(LucideIcons.calendar, color: textColor.withOpacity(0.7)),
+              title: Text(
+                DateFormat('MMM d, yyyy').format(_selectedDate),
+                style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+              ),
+              trailing: Icon(LucideIcons.chevronRight, color: textColor.withOpacity(0.5)),
+              onTap: () async {
+                final date = await showDatePicker(
+                  context: context,
+                  initialDate: _selectedDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                  builder: (context, child) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: widget.isDark 
+                          ? const ColorScheme.dark(primary: Color(0xFF6366F1))
+                          : const ColorScheme.light(primary: Color(0xFF6366F1)),
+                      ),
+                      child: child!,
+                    );
+                  },
+                );
+                if (date != null) {
+                  setState(() => _selectedDate = date);
+                }
+              },
             ),
           ),
           const SizedBox(height: 16),

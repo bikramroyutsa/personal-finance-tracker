@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../services/database_service.dart';
 import '../models/debt_record.dart';
@@ -20,7 +21,7 @@ class _AddDebtSheetState extends State<AddDebtSheet> {
   final _noteController = TextEditingController();
   
   String _selectedType = 'Lent'; // Lent or Borrowed
-  final DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now();
   
   Future<void> _saveDebt() async {
     if (_amountController.text.isEmpty || _personNameController.text.isEmpty) return;
@@ -154,6 +155,41 @@ class _AddDebtSheetState extends State<AddDebtSheet> {
                 hintStyle: TextStyle(color: textColor.withOpacity(0.5)),
                 icon: Icon(LucideIcons.user, color: textColor.withOpacity(0.5)),
               ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Date Picker
+          Container(
+            decoration: BoxDecoration(color: inputBg, borderRadius: BorderRadius.circular(12)),
+            child: ListTile(
+              leading: Icon(LucideIcons.calendar, color: textColor.withOpacity(0.7)),
+              title: Text(
+                DateFormat('MMM d, yyyy').format(_selectedDate),
+                style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+              ),
+              trailing: Icon(LucideIcons.chevronRight, color: textColor.withOpacity(0.5)),
+              onTap: () async {
+                final date = await showDatePicker(
+                  context: context,
+                  initialDate: _selectedDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                  builder: (context, child) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: widget.isDark 
+                          ? ColorScheme.dark(primary: primaryColor)
+                          : ColorScheme.light(primary: primaryColor),
+                      ),
+                      child: child!,
+                    );
+                  },
+                );
+                if (date != null) {
+                  setState(() => _selectedDate = date);
+                }
+              },
             ),
           ),
           const SizedBox(height: 16),
