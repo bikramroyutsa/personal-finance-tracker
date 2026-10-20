@@ -1,5 +1,7 @@
 # Personal Finance Tracker 💰
 
+A Finance Tracker I built according to my convenience. Feel free to use.
+
 A modern, offline-first personal finance and debt management application built with Flutter. Keep track of your daily expenses, analyze spending trends, manage debts, and log expenses anywhere on Android using the quick floating assistant.
 
 [![Download APK](https://img.shields.io/badge/Download-Release%20APK-brightgreen?logo=android&style=for-the-badge)](https://github.com/bikramroyutsa/personal-finance-tracker/releases/latest)
